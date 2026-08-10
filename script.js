@@ -42,34 +42,39 @@ document.querySelector(".print-page")?.addEventListener("click", () => {
   window.print();
 });
 
-const sectionObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      const activeLink = navLinks.find((link) => link.hash === `#${entry.target.id}`);
-      if (!activeLink) return;
-      navLinks.forEach((link) => link.classList.toggle("is-active", link === activeLink));
-    });
-  },
-  { rootMargin: "-35% 0px -55% 0px", threshold: 0.1 }
-);
+if ("IntersectionObserver" in window) {
+  const sectionObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const activeLink = navLinks.find((link) => link.hash === `#${entry.target.id}`);
+        if (!activeLink) return;
+        navLinks.forEach((link) => link.classList.toggle("is-active", link === activeLink));
+      });
+    },
+    { rootMargin: "-35% 0px -55% 0px", threshold: 0.1 }
+  );
 
-document.querySelectorAll("main > section[id]").forEach((section) => {
-  sectionObserver.observe(section);
-});
+  document.querySelectorAll("main > section[id]").forEach((section) => {
+    sectionObserver.observe(section);
+  });
 
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  },
-  { threshold: 0.18 }
-);
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.18 }
+  );
 
-revealItems.forEach((item) => revealObserver.observe(item));
+  revealItems.forEach((item) => revealObserver.observe(item));
+} else {
+  revealItems.forEach((item) => item.classList.add("is-visible"));
+}
+
 window.addEventListener("scroll", updateHeader, { passive: true });
 updateHeader();
